@@ -2,7 +2,7 @@ Project overview — The project's aim is for me to learn multiple aspects fo mo
 1. use of openai api models for making a chatbot
 2. using previous_response_id to maintain the converation (but this will be maintendon the opeanai side, we ahve not implemented any backend logic for this)
 3. we are saving the messages for each converation but mostly for display purposes and not so model can remember the converation
-4. handling multiple conversations
+4. handling multiple conversations: using dummy conversations and being able to switch bw them and extend them
 5. making new chats
 6. deleting old ones 
 

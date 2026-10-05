@@ -1,49 +1,78 @@
 const messageInput = document.getElementById("message");
 const sendButton = document.getElementById("send");
-const messages = document.getElementById("messages");
+const messagesList = document.getElementById("messages");
 const sidebar = document.querySelector(".sidebar");
 const toggleSidebar = document.getElementById("toggle-sidebar");
 const conversationsList = document.getElementById("conversations")
 
-const conversations = {
-    "conversation_jobsearch": {
-        title: "Job Search",
-        messages: []
-    },
-    "conversation_masters": {
-        title: "Masters",
-        messages: []
-    },
-    "conversation_business": {
-        title: "Business",
-        messages: []
+// const conversations = {
+//     "conversation_jobsearch": {
+//         title: "Job Search",
+//         messages: []
+//     },
+//     "conversation_masters": {
+//         title: "Masters",
+//         messages: []
+//     },
+//     "conversation_business": {
+//         title: "Business",
+//         messages: []
+//     }
+// };
+let activeConversationId = null; // Default conversation ID
+
+async function initializeChat() {
+    // Get all conversations
+    const response = await fetch("/conversations");
+    const conversations = await response.json();
+
+    // Display sidebar
+    displayConversations(conversations);
+
+    // Make the first conversation active
+    activeConversationId = conversations[0].id;
+
+    // Get and display its messages
+    await loadConversation(activeConversationId);
+}
+
+async function loadConversation(conversationId) {
+    const response = await fetch(`/conversations/${conversationId}`);
+    const conversation = await response.json();
+
+    messagesList.innerHTML = "";
+
+    for (const message of conversation.messages) {
+        addMessage(message.user, "user");
+        addMessage(message.assistant, "assistant");
     }
-};
-let activeConversationId = "conversation_jobsearch"; // Default conversation ID
+}
 
 function switchConversation(conversationId) {
     activeConversationId = conversationId;
-     console.log("Switched to:", conversationId);
+    loadConversation(conversationId);
+    console.log("Switched to:", conversationId);
 }
 
-function displayConversations(){
+async function displayConversations(conversations){
     conversationsList.innerHTML = "";
-     for (const conversationId in conversations){
-        // get conversation content
-        const conversation = conversations[conversationId];
+    
+    for (const conversation of conversations){
         // make the element and add it to the list
         const conversationElement = document.createElement("div");
         conversationElement.textContent = conversation.title;
         conversationElement.classList.add("conversation");
         conversationsList.appendChild(conversationElement);
+        
         // add the event listener to the element
         conversationElement.addEventListener("click", function() {
-            switchConversation(conversationId);
+            switchConversation( conversation.id);
         })
      }
 
 }
-displayConversations();
+
+
 // Send message
 async function sendMessage() {
     const message = messageInput.value.trim();
@@ -54,7 +83,6 @@ async function sendMessage() {
 
     addMessage(message, "user");
     messageInput.value = "";
-
     const response = await fetch("/chat", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -63,10 +91,8 @@ async function sendMessage() {
             message: message
         })
     });
-
     const data = await response.json();
-
-    addMessage(data.message, "model");
+    addMessage(data.message, "assistant");
 }
 
 // Display message
@@ -94,3 +120,5 @@ messageInput.addEventListener("keydown", function(event) {
 toggleSidebar.addEventListener("click", function() {
     sidebar.classList.toggle("hidden");
 });
+
+initializeChat();
