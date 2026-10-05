@@ -2,3 +2,6 @@
 outline.DOCX
 ~*
 *.tmp
+venv
+app/__pycache__
+*.pyc

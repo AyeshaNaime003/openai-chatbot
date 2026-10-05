@@ -1,131 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Chatbot</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 15px;
-            background: #222;
-            color: white;
-            text-align: center;
-        }
-
-        .messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            max-width: 75%;
-        }
-
-        .user {
-            background: #222;
-            color: white;
-            margin-left: auto;
-        }
-
-        .model {
-            background: #e5e5e5;
-            color: black;
-        }
-
-        .input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-        }
-
-        input {
-            flex: 1;
-            padding: 10px;
-        }
-
-        button {
-            padding: 10px 15px;
-        }
-    </style>
+    <title>Roman Urdu AI Assistant</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
 
-<div class="chat-container">
+<div class="app">
 
-    <div class="chat-header">
-        AI Chatbot
-    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <button id="new-chat">+ New Chat</button>
+        <div id="conversations">
+            <!-- Conversations will be added here by JavaScript -->
+        </div>
 
-    <div id="messages" class="messages"></div>
+    </aside>
 
-    <div class="input-area">
-        <input id="message" type="text" placeholder="Type a message">
-        <button onclick="sendMessage()">Send</button>
-    </div>
+    <!-- Main chat area -->
+    <main class="chat-container">
+
+        <header class="chat-header">
+            <button id="toggle-sidebar">☰</button>
+            <h1>Roman Urdu AI Assistant</h1>
+        </header>
+
+        <div id="messages" class="messages">
+            <!-- Messages will be added here -->
+        </div>
+
+        <div class="input-area">
+            <input id="message" type="text" placeholder="Ask something...">
+            <button id="send">Send</button>
+        </div>
+
+    </main>
 
 </div>
 
-<script>
-    // send user message to backend
-    async function sendMessage() {
-        const input = document.getElementById("message");
-        const message = input.value;
-        if (!message) {
-            return;
-        }
-        // Show user's message immediately
-        addMessage(message, "user");
-        input.value = "";
-        // Send message to FastAPI
-        const response = await fetch("/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: message
-            })
-        });
-
-        const data = await response.json();
-        // Show model response
-        addMessage(data.message, "model");
-    }
-
-    function addMessage(message, sender) {
-        const messages = document.getElementById("messages");
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message", sender);
-        messageElement.textContent = message;
-        messages.appendChild(messageElement);
-        // Scroll to newest message
-        messages.scrollTop = messages.scrollHeight;
-    }
-</script>
+<script src="/script.js"></script>
 
 </body>
 </html>
