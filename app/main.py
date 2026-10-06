@@ -20,7 +20,7 @@ async def get_conversations():
     return [
         {
             "id": conversation_id,
-            "title": conversation.title,
+            "title": conversation["title"],
             # "messages": conversation.previous_messages
         }
         for conversation_id, conversation in conversations.items()
@@ -31,8 +31,9 @@ async def get_conversation(conversation_id: str):
     conversation = conversations.get(conversation_id)
     return {
         conversation_id: conversation_id,
-        "title": conversation.title,
-        "messages": conversation.previous_messages}
+        "title": conversation["title"],
+        "messages": conversation["previous_messages"]
+        }
 
 @app.post("/chat")
 async def start(data: Message):

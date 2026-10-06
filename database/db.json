@@ -1,0 +1,26 @@
+{
+    "conversation_jobs": {
+        "title": "Jobs Search",
+        "previous_response_id": null,
+        "previous_messages": [
+            {"user": "What jobs should I apply for?", "assistant": "You should focus on junior AI and software engineering roles."},
+            {"user": "Should I tailor my CV?", "assistant": "Yes, tailor it to each relevant job description."}
+        ]
+    },
+
+    "conversation_masters": {
+        "title": "Masters",
+        "previous_response_id": null,
+        "previous_messages": [
+            {"user": "Which CS masters are available?", "assistant": "Let's look at English-taught programs in Germany."}
+        ]
+    },
+
+    "conversation_business": {
+        "title": "Business",
+        "previous_response_id": null,
+        "previous_messages": [
+            {"user": "How should I start the business?", "assistant": "Start by defining the problem and target customer."}
+        ]
+    }
+}
