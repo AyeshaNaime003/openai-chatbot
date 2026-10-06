@@ -3,8 +3,13 @@ Project overview — The project's aim is for me to learn multiple aspects fo mo
 2. using previous_response_id to maintain the converation (but this will be maintendon the opeanai side, we ahve not implemented any backend logic for this)
 3. we are saving the messages for each converation but mostly for display purposes and not so model can remember the converation
 4. handling multiple conversations: using dummy conversations and being able to switch bw them and extend them
+5. from using variable db to json db, Conversations class is no longer being used
 5. making new chats
 6. deleting old ones 
+
+
+issue to resolve:
+where should the database be openned in the backedn, because right now it openene d in openai client, but for neew chat it has to be opened in main also
 
 Tools and pacakges
 openai responses

@@ -4,22 +4,44 @@ const messagesList = document.getElementById("messages");
 const sidebar = document.querySelector(".sidebar");
 const toggleSidebar = document.getElementById("toggle-sidebar");
 const conversationsList = document.getElementById("conversations")
+const newChatButton = document.getElementById("new-chat");
 
-// const conversations = {
-//     "conversation_jobsearch": {
-//         title: "Job Search",
-//         messages: []
-//     },
-//     "conversation_masters": {
-//         title: "Masters",
-//         messages: []
-//     },
-//     "conversation_business": {
-//         title: "Business",
-//         messages: []
-//     }
-// };
 let activeConversationId = null; // Default conversation ID
+
+newChatButton.addEventListener("click", createNewChat);
+
+async function createNewChat() {
+    // ask for title
+    const title = prompt("Enter a title for the new chat:");
+    if (!title) {
+        alert("Title cannot be empty.");
+        return;
+    }
+    console.log("Creating new chat with title:", title);
+    // create new object in backend
+    const response = await fetch("/new_conversation", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ title: title })
+    });
+    const conversation = await response.json();
+    await switchConversation(conversation.conversation_id);
+    await refreshConversations(); // Refresh the conversation list
+    console.log("New chat created with ID:", conversation.conversation_id);
+}
+
+
+async function refreshConversations() {
+      // Get all conversations
+    const response = await fetch("/conversations");
+    const conversations = await response.json();
+    console.log(conversations);
+    // Display sidebar
+    displayConversations(conversations);
+
+    // Get and display its messages
+    // await loadConversation(activeConversationId);
+}
 
 async function initializeChat() {
     // Get all conversations
@@ -48,9 +70,9 @@ async function loadConversation(conversationId) {
     }
 }
 
-function switchConversation(conversationId) {
+async function switchConversation(conversationId) {
     activeConversationId = conversationId;
-    loadConversation(conversationId);
+    await loadConversation(conversationId);
     console.log("Switched to:", conversationId);
 }
 
@@ -66,7 +88,7 @@ async function displayConversations(conversations){
         
         // add the event listener to the element
         conversationElement.addEventListener("click", function() {
-            switchConversation( conversation.id);
+            switchConversation(conversation.id);
         })
      }
 
