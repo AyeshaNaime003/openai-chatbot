@@ -1,7 +1,7 @@
 # endpoint, functions and routing
 from fastapi import FastAPI
 from pydantic import BaseModel
-from .openai_client import chat, conversations
+from .openai_client import chat_with_openai
 import uuid 
 import json
 from fastapi.staticfiles import StaticFiles
@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 class Message(BaseModel):
     conversation_id : str
-    message : str
+    user_message : str
 
 class NewConversation(BaseModel):
     title : str
@@ -58,12 +58,25 @@ async def get_conversations():
     ]
 
 @app.post("/chat")
-async def start(data: Message):
-    print(f"data sent in the post \\chat function:   {data.message}")
-    output_text = await chat(data.message, data.conversation_id)
-    print(output_text)
-    return {"message": output_text}
-# implicit get function to serve the frontenfnastd files
+async def chat(data: Message):
+    print(f"\033[0;35m User: {data.user_message} \033[00m")
+    
+    with open("database\\db.json", "r") as file:
+        conversations = json.load(file)
+    
+    current_conversation = conversations[data.conversation_id]
+    previous_response_id = current_conversation['previous_response_id']
+    
+    assistant_message, new_response_id = await chat_with_openai(data.user_message, previous_response_id)
+
+    current_conversation['previous_response_id'] = new_response_id
+    current_conversation['previous_messages'].append({"user": data.user_message, "assistant": assistant_message})
+    
+    print(f"\033[0;34m Assistant: {assistant_message} \033[00m")
+    return {"message": assistant_message}
+
+
+# implicit get function to serve the frontend files
 app.mount("/", 
           StaticFiles(directory="frontend", html=True), 
           name="frontend")

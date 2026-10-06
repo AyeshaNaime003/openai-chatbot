@@ -98,11 +98,9 @@ async function displayConversations(conversations){
 // Send message
 async function sendMessage() {
     const message = messageInput.value.trim();
-
     if (!message) {
         return;
     }
-
     addMessage(message, "user");
     messageInput.value = "";
     const response = await fetch("/chat", {
@@ -110,7 +108,7 @@ async function sendMessage() {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             conversation_id: activeConversationId,
-            message: message
+            user_message: message
         })
     });
     const data = await response.json();
