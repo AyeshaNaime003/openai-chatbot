@@ -146,6 +146,20 @@ async function showMenu(menuButton, conversationId) {
 
     const deleteOption = document.createElement("div");
     deleteOption.textContent = "Delete";
+    deleteOption.addEventListener("click", async function (){
+        const response = await fetch(`conversations/${conversationId}`, {
+             method: "DELETE",
+            headers: {"Content-Type": "application/json"},
+            body:JSON.stringify()
+        })
+         if (!response.ok) {
+            alert("Failed to rename conversation.");
+            return;
+        }
+        menu.remove()
+        initializeChat()
+
+    })
 
     menu.appendChild(renameOption);
     menu.appendChild(deleteOption);

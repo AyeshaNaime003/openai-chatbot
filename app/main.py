@@ -17,6 +17,18 @@ class NewConversation(BaseModel):
 
 app = FastAPI()
 
+
+@app.delete("/conversations/{conversation_id}")
+async def delete_conversation(conversation_id: str):
+    conversations = load_conversations()
+    if conversation_id in conversations:
+        del conversations[conversation_id]
+        save_conversations(conversations)
+        return  {"message": "Conversation renamed successfully"}
+    else:
+        return HTTPException(status_code=404, detail="Conversation not found")
+    
+
 # rename a conversation
 @app.patch("/conversations/{conversation_id}")
 async def rename_conversation(conversation_id: str, data: NewConversation):
