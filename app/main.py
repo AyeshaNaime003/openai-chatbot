@@ -4,9 +4,8 @@ from pydantic import BaseModel
 from .openai_client import chat_with_openai
 from .database_operations import load_conversations, save_conversations
 import uuid 
-import json
 from fastapi.staticfiles import StaticFiles
-
+from fastapi import HTTPException
 
 
 class Message(BaseModel):
@@ -27,7 +26,7 @@ async def rename_conversation(conversation_id: str, data: NewConversation):
         save_conversations(conversations)
         return {"message": "Conversation renamed successfully"}
     else:
-        return {"error": "Conversation not found"}
+        raise HTTPException(status_code=404, detail="Conversation not found")
 
 
 # load, update(add new conversation), dump

@@ -137,6 +137,10 @@ async function showMenu(menuButton, conversationId) {
             headers: {"Content-Type": "application/json"},
             body:JSON.stringify({title: newTitle})
         });
+        if (!response.ok) {
+            alert("Failed to rename conversation.");
+            return;
+        }
         await refreshConversations();
     });
 
