@@ -1,5 +1,5 @@
 // element selectors
-const messageInput = document.getElementById("message");
+const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send");
 const messagesList = document.getElementById("messages");
 const sidebar = document.querySelector(".sidebar");
