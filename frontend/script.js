@@ -18,7 +18,7 @@ let recentSwitch = false
 newChatButton.addEventListener("click", createNewChat);
 
 
-async function getConversations(message, sender) {
+async function getConversations() {
     // Get all conversations
     const response = await fetch("/conversations");
     const conversations = await response.json();
@@ -62,7 +62,7 @@ async function createNewChat() {
     });
     const conversation = await response.json();
     // refresh the conversation list
-    refreshConversations();
+    await refreshConversations();
     // switch to the new conversation
     await switchConversation(conversation.conversation_id, conversation.title);
 }
@@ -87,7 +87,7 @@ async function switchConversation(conversationId, conversationTitle) {
     console.log("Switched to:", conversationId);
 }
 
-async function displayConversations(conversations){
+function displayConversations(conversations){
     conversationsList.innerHTML = "";
     
     for (const conversation of conversations){
@@ -124,7 +124,7 @@ async function displayConversations(conversations){
 
 }
 
-async function showMenu(menuButton, conversationId) {
+function showMenu(menuButton, conversationId) {
     const existingMenu = document.querySelector(".conversation-menu");
     if (existingMenu) {
         existingMenu.remove();
@@ -156,13 +156,12 @@ async function showMenu(menuButton, conversationId) {
     const deleteOption = document.createElement("div");
     deleteOption.textContent = "Delete";
     deleteOption.addEventListener("click", async function (){
-        const response = await fetch(`conversations/${conversationId}`, {
+        const response = await fetch(`/conversations/${conversationId}`, {
              method: "DELETE",
             headers: {"Content-Type": "application/json"},
-            body:JSON.stringify()
         })
          if (!response.ok) {
-            alert("Failed to rename conversation.");
+            alert("Failed to delete conversation.");
             return;
         }
         menu.remove()
@@ -205,7 +204,7 @@ async function sendMessage() {
     // if this was the first message after a switch then refresh
     if (recentSwitch){
         recentSwitch=false;
-        refreshConversations();
+        await refreshConversations();
     }
 }
 

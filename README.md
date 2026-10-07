@@ -8,10 +8,8 @@ Project overview — The project's aim is for me to learn multiple aspects fo mo
 6. deleting old ones 
 
 
-issue to resolve:
-1. prompt for title doesnt look good
-2. asssitant message is not formatted
-3, ,use rmessage need to be wrapped for 5 lines then become scollable
+issue to resolve
+
 
 Tools and pacakges
 openai responses

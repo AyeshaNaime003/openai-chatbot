@@ -24,9 +24,9 @@ async def delete_conversation(conversation_id: str):
     if conversation_id in conversations:
         del conversations[conversation_id]
         save_conversations(conversations)
-        return  {"message": "Conversation renamed successfully"}
+        return  {"message": "Conversation deleted successfully"}
     else:
-        return HTTPException(status_code=404, detail="Conversation not found")
+        raise HTTPException(status_code=404, detail="Conversation not found")
     
 
 # rename a conversation
@@ -50,7 +50,7 @@ async def create_conversation(data: NewConversation):
             "title": data.title,
             "previous_response_id": None,
             "previous_messages": [],
-            "last_message_at": datetime.now().replace(microsecond=0).isoformat()
+            "last_activity_at": datetime.now().replace(microsecond=0).isoformat()
         }
     save_conversations(conversations)
     return {"conversation_id": conversation_id, 
@@ -60,12 +60,15 @@ async def create_conversation(data: NewConversation):
 @app.get("/conversations/{conversation_id}")
 async def get_messages(conversation_id: str):  
     conversations = load_conversations()
-    conversation = conversations[conversation_id]
-    return {
-        "conversation_id": conversation_id,
-        "title": conversation["title"],
-        "messages": conversation["previous_messages"]
-        }
+    if conversation_id in conversations:
+        current_conversation = conversations[conversation_id]
+        return {
+            "conversation_id": conversation_id,
+            "title": current_conversation["title"],
+            "messages": current_conversation["previous_messages"]
+            }
+    else:
+         raise HTTPException(status_code=404, detail="Conversation not found")
 
 # load
 @app.get("/conversations")
@@ -73,7 +76,7 @@ async def get_conversations():
     conversations = load_conversations()
     sorted_conversations = sorted(
         conversations.items(),
-        key=lambda item: item[1]["last_message_at"],
+        key=lambda item: item[1]["last_activity_at"],
         reverse=True
     )
 
@@ -98,7 +101,7 @@ async def chat(data: Message):
     assistant_message, new_response_id = await chat_with_openai(data.user_message, previous_response_id)
 
     timestamp = datetime.now().replace(microsecond=0).isoformat()
-    current_conversation['last_message_at'] = timestamp
+    current_conversation['last_activity_at'] = timestamp
     current_conversation['previous_response_id'] = new_response_id
     current_conversation['previous_messages'].append({"user": data.user_message, "assistant": assistant_message, "time":timestamp})
 
