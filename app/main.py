@@ -6,7 +6,7 @@ from .database_operations import load_conversations, save_conversations
 import uuid 
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
-
+from datetime import datetime
 
 class Message(BaseModel):
     conversation_id : str
@@ -49,7 +49,8 @@ async def create_conversation(data: NewConversation):
     conversations[conversation_id] = {
             "title": data.title,
             "previous_response_id": None,
-            "previous_messages": []
+            "previous_messages": [],
+            "last_message_at": datetime.now().replace(microsecond=0).isoformat()
         }
     save_conversations(conversations)
     return {"conversation_id": conversation_id, 
@@ -70,12 +71,18 @@ async def get_messages(conversation_id: str):
 @app.get("/conversations")
 async def get_conversations():
     conversations = load_conversations()
+    sorted_conversations = sorted(
+        conversations.items(),
+        key=lambda item: item[1]["last_message_at"],
+        reverse=True
+    )
+
     return [
         {
             "conversation_id": conversation_id,
             "title": conversation["title"],
         }
-        for conversation_id, conversation in conversations.items()
+        for conversation_id, conversation in sorted_conversations
     ]
 
 
@@ -90,8 +97,10 @@ async def chat(data: Message):
     
     assistant_message, new_response_id = await chat_with_openai(data.user_message, previous_response_id)
 
+    timestamp = datetime.now().replace(microsecond=0).isoformat()
+    current_conversation['last_message_at'] = timestamp
     current_conversation['previous_response_id'] = new_response_id
-    current_conversation['previous_messages'].append({"user": data.user_message, "assistant": assistant_message})
+    current_conversation['previous_messages'].append({"user": data.user_message, "assistant": assistant_message, "time":timestamp})
 
     save_conversations(conversations)
     

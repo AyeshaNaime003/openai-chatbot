@@ -9,7 +9,9 @@ Project overview — The project's aim is for me to learn multiple aspects fo mo
 
 
 issue to resolve:
-where should the database be openned in the backedn, because right now it openene d in openai client, but for neew chat it has to be opened in main also
+1. prompt for title doesnt look good
+2. asssitant message is not formatted
+3, ,use rmessage need to be wrapped for 5 lines then become scollable
 
 Tools and pacakges
 openai responses

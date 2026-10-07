@@ -8,6 +8,7 @@ const conversationsList = document.getElementById("conversations")
 const newChatButton = document.getElementById("new-chat");
 // variables
 let activeConversationId = null; // Default conversation ID
+let recentSwitch = false
 // event listeners
 newChatButton.addEventListener("click", createNewChat);
 
@@ -74,6 +75,7 @@ async function loadMessages(conversationId) {
 
 async function switchConversation(conversationId) {
     activeConversationId = conversationId;
+    recentSwitch = true
     await loadMessages(conversationId);
     console.log("Switched to:", conversationId);
 }
@@ -193,6 +195,11 @@ async function sendMessage() {
     const data = await response.json();
     // add assistant message to the chat
     addMessage(data.message, "assistant");
+    // if this was the first message after a switch then refresh
+    if (recentSwitch){
+        recentSwitch=false;
+        refreshConversations();
+    }
 }
 
 // Display message
