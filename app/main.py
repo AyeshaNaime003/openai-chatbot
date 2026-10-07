@@ -18,6 +18,18 @@ class NewConversation(BaseModel):
 
 app = FastAPI()
 
+# rename a conversation
+@app.patch("/conversations/{conversation_id}")
+async def rename_conversation(conversation_id: str, data: NewConversation):
+    conversations = load_conversations()
+    if conversation_id in conversations:
+        conversations[conversation_id]["title"] = data.title
+        save_conversations(conversations)
+        return {"message": "Conversation renamed successfully"}
+    else:
+        return {"error": "Conversation not found"}
+
+
 # load, update(add new conversation), dump
 @app.post("/new_conversation")
 async def create_conversation(data: NewConversation):

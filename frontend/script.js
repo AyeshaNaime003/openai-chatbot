@@ -22,7 +22,11 @@ async function getConversations(message, sender) {
 // initialize chat
 async function initializeChat() {
     const conversations = await getConversations();
-    console.log("Conversations:", conversations);
+    if (conversations.length === 0) {
+        // If no conversations exist, create a new one
+        await createNewChat();
+        return;
+    }
     // Display sidebar
     displayConversations(conversations);
     // Make the first conversation active
@@ -76,16 +80,61 @@ async function displayConversations(conversations){
     for (const conversation of conversations){
         // make the element and add it to the list
         const conversationElement = document.createElement("div");
-        conversationElement.textContent = conversation.title;
-        conversationElement.classList.add("conversation");
+        conversationElement.classList.add("conversation-card");
+        
+        // title
+        const titleElement = document.createElement("span");
+        titleElement.textContent = conversation.title;
+        conversationElement.appendChild(titleElement);
+        
+        // menu
+        const menuButton = document.createElement("button");
+        menuButton.textContent = "⋮";
+        menuButton.classList.add("conversation-menu-button");
+        
+        // add event listener to the menu button
+        menuButton.addEventListener("click", function(event) {
+            event.stopPropagation();
+            showMenu(menuButton)
+        });
+        conversationElement.appendChild(menuButton);
+
+        // add the new conversation element to the list
         conversationsList.appendChild(conversationElement);
         
         // add the event listener to the element
         conversationElement.addEventListener("click", function() {
             switchConversation(conversation.conversation_id);
         })
+
      }
 
+}
+
+function showMenu(menuButton) {
+    const existingMenu = document.querySelector(".conversation-menu");
+    if (existingMenu) {
+        existingMenu.remove();
+        return;
+    }
+    const menu = document.createElement("div");
+    menu.classList.add("conversation-menu");
+
+    const renameOption = document.createElement("div");
+    renameOption.textContent = "Rename";
+
+    const deleteOption = document.createElement("div");
+    deleteOption.textContent = "Delete";
+
+    menu.appendChild(renameOption);
+    menu.appendChild(deleteOption);
+    // conversationElement.appendChild(menu);
+    document.body.appendChild(menu);
+    // Get button's position on the screen
+    const buttonRect = menuButton.getBoundingClientRect();
+    // Position menu next to button
+    menu.style.top = `${buttonRect.top}px`;
+    menu.style.left = `${buttonRect.right + 5}px`;
 }
 
 // Send message
