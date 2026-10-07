@@ -1,4 +1,5 @@
 // element selectors
+const titleHeading = document.getElementById("title-heading")
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send");
 const messagesList = document.getElementById("messages");
@@ -6,6 +7,10 @@ const sidebar = document.querySelector(".sidebar");
 const toggleSidebar = document.getElementById("toggle-sidebar");
 const conversationsList = document.getElementById("conversations")
 const newChatButton = document.getElementById("new-chat");
+const modal = document.getElementById("modal");
+const modalInput = document.getElementById("modal-input");
+const modalConfirm = document.getElementById("modal-confirm");
+const modalCancel = document.getElementById("modal-cancel");
 // variables
 let activeConversationId = null; // Default conversation ID
 let recentSwitch = false
@@ -31,8 +36,8 @@ async function initializeChat() {
     // Display sidebar
     displayConversations(conversations);
     // Make the first conversation active
-    const lastConversation = conversations[conversations.length - 1];
-    switchConversation(lastConversation.conversation_id);
+    const lastConversation = conversations[0];
+    switchConversation(lastConversation.conversation_id, lastConversation.title);
 }
 
 async function refreshConversations() {
@@ -42,7 +47,8 @@ async function refreshConversations() {
 
 async function createNewChat() {
     // title prompt
-    const title = prompt("Enter a title for the new chat:");
+    const title = await showModal("Give a title to yout chat");
+    // const title = prompt("Enter a title for the new chat:");
     if (!title) {
         alert("Title cannot be empty.");
         return;
@@ -58,7 +64,7 @@ async function createNewChat() {
     // refresh the conversation list
     refreshConversations();
     // switch to the new conversation
-    await switchConversation(conversation.conversation_id);
+    await switchConversation(conversation.conversation_id, conversation.title);
 }
 
 async function loadMessages(conversationId) {
@@ -73,9 +79,10 @@ async function loadMessages(conversationId) {
     }
 }
 
-async function switchConversation(conversationId) {
+async function switchConversation(conversationId, conversationTitle) {
     activeConversationId = conversationId;
     recentSwitch = true
+    titleHeading.textContent = conversationTitle
     await loadMessages(conversationId);
     console.log("Switched to:", conversationId);
 }
@@ -110,7 +117,7 @@ async function displayConversations(conversations){
         
         // add the event listener to the element
         conversationElement.addEventListener("click", function() {
-            switchConversation(conversation.conversation_id);
+            switchConversation(conversation.conversation_id, conversation.title);
         })
 
      }
@@ -129,7 +136,7 @@ async function showMenu(menuButton, conversationId) {
     const renameOption = document.createElement("div");
     renameOption.textContent = "Rename";
     renameOption.addEventListener("click", async function() {
-        const newTitle = prompt("Enter a new title for the conversation:");
+        const newTitle = await showModal("Rename your chat")
         if (!newTitle) {
             alert("Title cannot be empty.");
             return;
@@ -229,3 +236,50 @@ toggleSidebar.addEventListener("click", function() {
 });
 
 initializeChat();
+
+function showModal(prompt) {
+    return new Promise(function(resolve){
+        document.getElementById("modal-title").textContent = prompt;
+        modal.classList.remove("hidden");
+        modalInput.value = "";
+        modalInput.focus();
+
+        modalConfirm.onclick=function(){
+            const title = modalInput.value.trim();
+            if(!title){
+                return ;
+            }
+            modal.classList.add("hidden");
+            resolve(title);
+        };
+        modalCancel.onclick = function() {
+            modal.classList.add("hidden");
+            resolve(null);
+        };
+    });
+    
+}
+
+function closeModal() {
+    modal.classList.add("hidden");
+}
+
+// modalConfirm.addEventListener("click", async function() {
+//     const title = modalInput.value.trim();
+//      if (!title) {
+//         alert("Title cannot be empty.");
+//         return;
+//     }
+//     console.log("Creating new chat with title:", title);
+//     // create new object in backend
+//     const response = await fetch("/new_conversation", {
+//         method: "POST",
+//         headers: {"Content-Type": "application/json"},
+//         body: JSON.stringify({ title: title })
+//     });
+//     const conversation = await response.json();
+//     // refresh the conversation list
+//     refreshConversations();
+//     // switch to the new conversation
+//     await switchConversation(conversation.conversation_id);
+// });

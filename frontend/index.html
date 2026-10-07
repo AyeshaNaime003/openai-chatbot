@@ -23,7 +23,7 @@
 
         <header class="chat-header">
             <button id="toggle-sidebar">☰</button>
-            <h1>Roman Urdu AI Assistant</h1>
+            <h1 id="title-heading">Roman Urdu AI Assistant</h1>
         </header>
 
         <div id="messages" class="messages">
@@ -34,6 +34,19 @@
             <textarea id="message-input" type="text" placeholder="Ask something..."></textarea>
             <button id="send">Send</button>
         </div>
+
+        
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 id="modal-title">Rename conversation</h3>
+                <input id="modal-input" type="text">
+                <div>
+                    <button id="modal-cancel">Cancel</button>
+                    <button id="modal-confirm">Save</button>
+                </div>
+            </div>
+        </div>
+
 
     </main>
 

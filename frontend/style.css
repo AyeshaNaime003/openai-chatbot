@@ -194,3 +194,69 @@ body {
 #send:hover {
     background: #444;
 }
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    width: 320px;
+    padding: 20px;
+    background: #343541;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    margin: 0 0 15px;
+    color: white;
+}
+
+#modal-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #565869;
+    border-radius: 6px;
+    background: #40414f;
+    color: white;
+    outline: none;
+}
+
+#modal-input:focus {
+    border-color: #8e8ea0;
+}
+
+.modal-content > div:last-child {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.modal-content button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#modal-cancel {
+    background: #565869;
+    color: white;
+}
+
+#modal-confirm {
+    background: #297555;
+    color: white;
+}
