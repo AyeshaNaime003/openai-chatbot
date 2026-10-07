@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from .openai_client import chat_with_openai
+from .database_operations import load_conversations, save_conversations
 import uuid 
 import json
 from fastapi.staticfiles import StaticFiles
@@ -17,53 +18,50 @@ class NewConversation(BaseModel):
 
 app = FastAPI()
 
-
+# load, update(add new conversation), dump
 @app.post("/new_conversation")
 async def create_conversation(data: NewConversation):
     conversation_id = str(uuid.uuid4())
-    with open("database\\db.json", "r") as file:
-        conversations = json.load(file)
-        conversations[conversation_id] = {
+    conversations = load_conversations()
+    conversations[conversation_id] = {
             "title": data.title,
             "previous_response_id": None,
             "previous_messages": []
         }
-    with open("database\\db.json", "w") as file:
-        json.dump(conversations, file)
+    save_conversations(conversations)
     return {"conversation_id": conversation_id, 
             "title": data.title}
 
+# load
 @app.get("/conversations/{conversation_id}")
-async def get_conversation(conversation_id: str):  
-    with open("database\\db.json", "r") as file:
-        json_conversations = json.load(file)
-    conversation = json_conversations[conversation_id]
+async def get_messages(conversation_id: str):  
+    conversations = load_conversations()
+    conversation = conversations[conversation_id]
     return {
         "conversation_id": conversation_id,
         "title": conversation["title"],
         "messages": conversation["previous_messages"]
         }
 
+# load
 @app.get("/conversations")
 async def get_conversations():
-    with open("database\\db.json", "r") as file:
-        json_conversations = json.load(file)
+    conversations = load_conversations()
     return [
         {
-            "id": conversation_id,
+            "conversation_id": conversation_id,
             "title": conversation["title"],
-            # "messages": conversation.previous_messages
         }
-        for conversation_id, conversation in json_conversations.items()
+        for conversation_id, conversation in conversations.items()
     ]
 
+
+# load, update, dump
 @app.post("/chat")
 async def chat(data: Message):
     print(f"\033[0;35m User: {data.user_message} \033[00m")
     
-    with open("database\\db.json", "r") as file:
-        conversations = json.load(file)
-    
+    conversations = load_conversations()
     current_conversation = conversations[data.conversation_id]
     previous_response_id = current_conversation['previous_response_id']
     
@@ -71,6 +69,8 @@ async def chat(data: Message):
 
     current_conversation['previous_response_id'] = new_response_id
     current_conversation['previous_messages'].append({"user": data.user_message, "assistant": assistant_message})
+
+    save_conversations(conversations)
     
     print(f"\033[0;34m Assistant: {assistant_message} \033[00m")
     return {"message": assistant_message}

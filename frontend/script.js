@@ -1,3 +1,4 @@
+// element selectors
 const messageInput = document.getElementById("message");
 const sendButton = document.getElementById("send");
 const messagesList = document.getElementById("messages");
@@ -5,13 +6,32 @@ const sidebar = document.querySelector(".sidebar");
 const toggleSidebar = document.getElementById("toggle-sidebar");
 const conversationsList = document.getElementById("conversations")
 const newChatButton = document.getElementById("new-chat");
-
+// variables
 let activeConversationId = null; // Default conversation ID
-
+// event listeners
 newChatButton.addEventListener("click", createNewChat);
 
+
+async function getConversations(message, sender) {
+    // Get all conversations
+    const response = await fetch("/conversations");
+    const conversations = await response.json();
+    return conversations;
+}
+
+// initialize chat
+async function initializeChat() {
+    const conversations = await getConversations();
+    console.log("Conversations:", conversations);
+    // Display sidebar
+    displayConversations(conversations);
+    // Make the first conversation active
+    const lastConversation = conversations[conversations.length - 1];
+    switchConversation(lastConversation.conversation_id);
+}
+
 async function createNewChat() {
-    // ask for title
+    // title prompt
     const title = prompt("Enter a title for the new chat:");
     if (!title) {
         alert("Title cannot be empty.");
@@ -25,40 +45,14 @@ async function createNewChat() {
         body: JSON.stringify({ title: title })
     });
     const conversation = await response.json();
+    // refresh the conversation list
+    conversations = await getConversations();
+    displayConversations(conversations);
+    // switch to the new conversation
     await switchConversation(conversation.conversation_id);
-    await refreshConversations(); // Refresh the conversation list
-    console.log("New chat created with ID:", conversation.conversation_id);
 }
 
-
-async function refreshConversations() {
-      // Get all conversations
-    const response = await fetch("/conversations");
-    const conversations = await response.json();
-    console.log(conversations);
-    // Display sidebar
-    displayConversations(conversations);
-
-    // Get and display its messages
-    // await loadConversation(activeConversationId);
-}
-
-async function initializeChat() {
-    // Get all conversations
-    const response = await fetch("/conversations");
-    const conversations = await response.json();
-
-    // Display sidebar
-    displayConversations(conversations);
-
-    // Make the first conversation active
-    activeConversationId = conversations[0].id;
-
-    // Get and display its messages
-    await loadConversation(activeConversationId);
-}
-
-async function loadConversation(conversationId) {
+async function loadMessages(conversationId) {
     const response = await fetch(`/conversations/${conversationId}`);
     const conversation = await response.json();
 
@@ -72,7 +66,7 @@ async function loadConversation(conversationId) {
 
 async function switchConversation(conversationId) {
     activeConversationId = conversationId;
-    await loadConversation(conversationId);
+    await loadMessages(conversationId);
     console.log("Switched to:", conversationId);
 }
 
@@ -88,12 +82,11 @@ async function displayConversations(conversations){
         
         // add the event listener to the element
         conversationElement.addEventListener("click", function() {
-            switchConversation(conversation.id);
+            switchConversation(conversation.conversation_id);
         })
      }
 
 }
-
 
 // Send message
 async function sendMessage() {
@@ -101,8 +94,10 @@ async function sendMessage() {
     if (!message) {
         return;
     }
+    // add user message to the chat
     addMessage(message, "user");
     messageInput.value = "";
+    // send the message to the backend
     const response = await fetch("/chat", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -112,6 +107,7 @@ async function sendMessage() {
         })
     });
     const data = await response.json();
+    // add assistant message to the chat
     addMessage(data.message, "assistant");
 }
 
