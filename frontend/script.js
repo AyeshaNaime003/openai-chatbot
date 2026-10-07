@@ -34,6 +34,11 @@ async function initializeChat() {
     switchConversation(lastConversation.conversation_id);
 }
 
+async function refreshConversations() {
+    const conversations = await getConversations();
+    displayConversations(conversations);
+}
+
 async function createNewChat() {
     // title prompt
     const title = prompt("Enter a title for the new chat:");
@@ -50,8 +55,7 @@ async function createNewChat() {
     });
     const conversation = await response.json();
     // refresh the conversation list
-    conversations = await getConversations();
-    displayConversations(conversations);
+    refreshConversations();
     // switch to the new conversation
     await switchConversation(conversation.conversation_id);
 }
@@ -95,7 +99,7 @@ async function displayConversations(conversations){
         // add event listener to the menu button
         menuButton.addEventListener("click", function(event) {
             event.stopPropagation();
-            showMenu(menuButton)
+            showMenu(menuButton, conversation.conversation_id)
         });
         conversationElement.appendChild(menuButton);
 
@@ -111,7 +115,7 @@ async function displayConversations(conversations){
 
 }
 
-function showMenu(menuButton) {
+async function showMenu(menuButton, conversationId) {
     const existingMenu = document.querySelector(".conversation-menu");
     if (existingMenu) {
         existingMenu.remove();
@@ -122,6 +126,19 @@ function showMenu(menuButton) {
 
     const renameOption = document.createElement("div");
     renameOption.textContent = "Rename";
+    renameOption.addEventListener("click", async function() {
+        const newTitle = prompt("Enter a new title for the conversation:");
+        if (!newTitle) {
+            alert("Title cannot be empty.");
+            return;
+        }
+        const response = await fetch(`/conversations/${conversationId}`,{
+            method: "PATCH",
+            headers: {"Content-Type": "application/json"},
+            body:JSON.stringify({title: newTitle})
+        });
+        await refreshConversations();
+    });
 
     const deleteOption = document.createElement("div");
     deleteOption.textContent = "Delete";
