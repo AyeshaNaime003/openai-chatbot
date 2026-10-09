@@ -11,7 +11,6 @@ Project overview — The project's aim is for me to learn multiple aspects fo mo
 issue to resolve
 1. bubble whe the assistant is thinking
 2. menu should disappear when clicked anywhere else
-3. the title shoudl be there in input when tryin to rename
 4. responsiveness
 
 Tools and pacakges

@@ -55,7 +55,7 @@ async function createNewChat(fromZero=false){
     else{
         prompt = "Give a title to your chat";
     }
-    const title = await showModal(prompt);
+    const title = await showModal(prompt, "");
 
     // const title = prompt("Enter a title for the new chat:");
     if (!title) {
@@ -117,7 +117,7 @@ function displayConversations(conversations){
         // add event listener to the menu button
         menuButton.addEventListener("click", function(event) {
             event.stopPropagation();
-            showMenu(menuButton, conversation.conversation_id)
+            showMenu(menuButton, conversation)
         });
         conversationElement.appendChild(menuButton);
 
@@ -133,7 +133,7 @@ function displayConversations(conversations){
 
 }
 
-function showMenu(menuButton, conversationId) {
+function showMenu(menuButton, conversation) {
     const existingMenu = document.querySelector(".conversation-menu");
     if (existingMenu) {
         existingMenu.remove();
@@ -145,12 +145,12 @@ function showMenu(menuButton, conversationId) {
     const renameOption = document.createElement("div");
     renameOption.textContent = "Rename";
     renameOption.addEventListener("click", async function() {
-        const newTitle = await showModal("Rename your chat")
+        const newTitle = await showModal("Rename your chat", conversation.title)
         if (!newTitle) {
             alert("Title cannot be empty.");
             return;
         }
-        const response = await fetch(`/conversations/${conversationId}`,{
+        const response = await fetch(`/conversations/${conversation.conversation_id}`,{
             method: "PATCH",
             headers: {"Content-Type": "application/json"},
             body:JSON.stringify({title: newTitle})
@@ -165,7 +165,7 @@ function showMenu(menuButton, conversationId) {
     const deleteOption = document.createElement("div");
     deleteOption.textContent = "Delete";
     deleteOption.addEventListener("click", async function (){
-        const response = await fetch(`/conversations/${conversationId}`, {
+        const response = await fetch(`/conversations/${conversation.conversation_id}`, {
              method: "DELETE",
             headers: {"Content-Type": "application/json"},
         })
@@ -245,11 +245,11 @@ toggleSidebar.addEventListener("click", function() {
 
 initializeChat();
 
-function showModal(prompt) {
+function showModal(prompt, placeholder) {
     return new Promise(function(resolve){
         document.getElementById("modal-title").textContent = prompt;
         modal.classList.remove("hidden");
-        modalInput.value = "";
+        modalInput.value = placeholder;
         modalInput.focus();
 
         modalConfirm.onclick=function(){
