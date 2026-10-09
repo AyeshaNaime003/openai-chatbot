@@ -1,4 +1,4 @@
-# OpenAI Chatbot
+# My AI Assistant - An openAI chatbot
 
 ## Purpose
 
