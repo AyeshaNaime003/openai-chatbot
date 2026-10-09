@@ -15,7 +15,7 @@ const modalCancel = document.getElementById("modal-cancel");
 let activeConversationId = null; // Default conversation ID
 let recentSwitch = false
 // event listeners
-newChatButton.addEventListener("click", createNewChat);
+newChatButton.addEventListener("click", () => createNewChat(false));
 
 
 async function getConversations() {
@@ -30,7 +30,7 @@ async function initializeChat() {
     const conversations = await getConversations();
     if (conversations.length === 0) {
         // If no conversations exist, create a new one
-        await createNewChat();
+        await createNewChat(true);
         return;
     }
     // Display sidebar
@@ -45,9 +45,18 @@ async function refreshConversations() {
     displayConversations(conversations);
 }
 
-async function createNewChat() {
+async function createNewChat(fromZero=false){
+     console.log("fromZero:", fromZero);
     // title prompt
-    const title = await showModal("Give a title to yout chat");
+    let prompt;
+    if(fromZero){
+        prompt = "Give a title to your first chat";
+    }
+    else{
+        prompt = "Give a title to your chat";
+    }
+    const title = await showModal(prompt);
+
     // const title = prompt("Enter a title for the new chat:");
     if (!title) {
         alert("Title cannot be empty.");
@@ -165,7 +174,7 @@ function showMenu(menuButton, conversationId) {
             return;
         }
         menu.remove()
-        initializeChat()
+        await refreshConversations()
 
     })
 
@@ -281,4 +290,4 @@ function closeModal() {
 //     refreshConversations();
 //     // switch to the new conversation
 //     await switchConversation(conversation.conversation_id);
-// });
+// });o
