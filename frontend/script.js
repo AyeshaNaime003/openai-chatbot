@@ -134,6 +134,13 @@ function displayConversations(conversations){
 }
 
 function showMenu(menuButton, conversation) {
+    document.addEventListener("click", function closeMenu(event) {
+    if (!menu.contains(event.target) && !menuButton.contains(event.target)) {
+        menu.remove();
+        document.removeEventListener("click", closeMenu);
+    }
+        });
+
     const existingMenu = document.querySelector(".conversation-menu");
     if (existingMenu) {
         existingMenu.remove();
@@ -198,7 +205,7 @@ async function sendMessage() {
     // add user message to the chat
     addMessage(message, "user");
     messageInput.value = "";
-    // send the message to the backend
+    try {
     const response = await fetch("/chat", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -207,10 +214,17 @@ async function sendMessage() {
             user_message: message
         })
     });
+    if (!response.ok) {
+        throw new Error("Failed to get assistant response.");
+    }
     const data = await response.json();
-    // add assistant message to the chat
     addMessage(data.message, "assistant");
-    // if this was the first message after a switch then refresh
+    } catch (error) {
+        addMessage("Something went wrong. Please try again.", "assistant");
+    } finally {
+        typingIndicator.remove();
+    }
+    // if this was the firstmessage after a conversation switch, then refresh to rearrange the conversations in side bar
     if (recentSwitch){
         recentSwitch=false;
         await refreshConversations();
@@ -272,22 +286,16 @@ function closeModal() {
     modal.classList.add("hidden");
 }
 
-// modalConfirm.addEventListener("click", async function() {
-//     const title = modalInput.value.trim();
-//      if (!title) {
-//         alert("Title cannot be empty.");
-//         return;
-//     }
-//     console.log("Creating new chat with title:", title);
-//     // create new object in backend
-//     const response = await fetch("/new_conversation", {
-//         method: "POST",
-//         headers: {"Content-Type": "application/json"},
-//         body: JSON.stringify({ title: title })
-//     });
-//     const conversation = await response.json();
-//     // refresh the conversation list
-//     refreshConversations();
-//     // switch to the new conversation
-//     await switchConversation(conversation.conversation_id);
-// });o
+function showTypingIndicator() {
+    const indicator = document.createElement("div");
+    indicator.classList.add("typing-indicator");
+
+    for (let i = 0; i < 3; i++) {
+        indicator.appendChild(document.createElement("span"));
+    }
+
+    messagesList.appendChild(indicator);
+    messagesList.scrollTop = messagesList.scrollHeight;
+
+    return indicator;
+}

@@ -195,6 +195,39 @@ body {
     background: #444;
 }
 
+
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 12px;
+    width: fit-content;
+    background: #343541;
+    border-radius: 10px;
+    margin: 8px 0;
+}
+
+.typing-indicator span {
+    width: 7px;
+    height: 7px;
+    background: #ccc;
+    border-radius: 50%;
+    animation: typing 1.2s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+}
+
+/* Naming modal */
 .modal {
     position: fixed;
     inset: 0;
