@@ -1,5 +1,8 @@
 # My AI Assistant - An openAI chatbot
 
+[View Live Demo](https://my-ai-assistant-lee0.onrender.com/)
+![Thumbnail of the project](./thumbnail.png)
+
 ## Purpose
 
 I built this project primarily as a learning exercise. I wanted to move beyond calling an LLM API in isolation and build a complete application around it. My goals were to understand OpenAI's Responses API, use it to build a chatbot with persistent conversation context, and improve my web engineering skills, particularly JavaScript.
